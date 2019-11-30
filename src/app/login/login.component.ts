@@ -12,67 +12,57 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-  loginForm:FormGroup;
+  loginForm: FormGroup;
+  login: Login = new Login();
   isSubmitted = false;
-  login:Login=new Login();
-  logins: Observable <Login[]>;
+  logins: Observable<Login[]>;
+
   
-  constructor(private authService: AuthService,
-    private router: Router,
-    private formBuilder: FormBuilder,private toastr:ToastrService) { }
+  constructor(private service: AuthService, private router: Router,
+    private formBuilder: FormBuilder, private toastr: ToastrService) { }
 
   ngOnInit() {
-
-    this.logins=this.authService.getLoginDet();
-    this.loginForm=this.formBuilder.group({
-      username: ['',Validators.compose([Validators.required])],
-      password:['',[Validators.required]]
-  });
-}
-
-get formControls()
-{
-  return this.loginForm.controls;
-}
-loginUser()
-{
-  this.login.username=this.loginForm.controls.username.value;
-  this.login.password=this.loginForm.controls.password.value;
-  console.log(this.loginForm.value);
-  this.isSubmitted=true;
-  if(this.loginForm.invalid)
-  {
-    this.toastr.error('enter username and password');
-    return;
+    this.loginForm = this.formBuilder.group({
+      username: ['', [Validators.required]],
+      password: ['', [Validators.required]]
+    });
   }
 
-  this.authService.Login(this.login).subscribe(x=>{
-    x.forEach(element => {
-     this.login.usertype=element["usertype"];
-     if(this.login.usertype=='Admin')
-     {
-       localStorage.setItem('username',this.login.username);
-       this.router.navigateByUrl('assets');
-       this.toastr.success('Login Successful..!!');
-     }
-     else
-     {
-       localStorage.setItem('username',this.login.username);
-       this.router.navigateByUrl('assets');
+  get formControls() {
+    return this.loginForm.controls;
+  }
 
-       this.toastr.success('Login Successful..!!');
-     }
-   },
-   error=>{
-   
-     this.toastr.error('Invalid Username or Password');
-     
-   });
-   console.log(this.login.usertype);  
-    });
- 
-  
-}
+  loginUser() {
+    console.log(this.loginForm.value);
+    
+    this.isSubmitted = true;
+    if (this.loginForm.invalid) {
+      this.toastr.error('Enter username and password');
+      return;
+    }
+    this.service.Login(this.loginForm.value).subscribe(element=> {
+      if(element!=null){
+
+
+        if (element["usertype"] == 'Admin') {
+         
+          localStorage.setItem('ACCESS_TOKEN', element["username"]);
+          this.router.navigateByUrl('/admin');
+          this.toastr.success('Welcome Admin', 'Login Successful');
+        }
+        else if (element["usertype"] == 'User') {
+          this.router.navigateByUrl('/user');
+          this.toastr.success('Welcome Purchase Manager', 'Login Successful');
+        }
+      }
+      else{
+        this.toastr.warning('enter valid username and password');
+      }
+      });
+
+    
+    
+  }
 
 
 }

@@ -3,6 +3,7 @@ import { Observable, from } from 'rxjs';
 import { AssetDef } from '../asset-def';
 import { AssetDefService } from '../asset-def.service';
 import { Router } from '@angular/router';
+import { AssetType } from '../asset-type';
 @Component({
   selector: 'app-asset-list',
   templateUrl: './asset-list.component.html',
@@ -10,8 +11,9 @@ import { Router } from '@angular/router';
 })
 export class AssetListComponent implements OnInit {
 
-  asset: Observable<AssetDef>;
+  assettype:Observable<AssetType[]>
   assets: Observable<AssetDef[]>;
+  
 
   constructor(private assetdefService: AssetDefService,
     private router: Router) { }
@@ -20,7 +22,7 @@ export class AssetListComponent implements OnInit {
     this.reloadData();
   }
   reloadData() {
-    this.asset = this.assetdefService.getAssetList();
+    this.assettype = this.assetdefService.getAssetType();
     this.assets = this.assetdefService.getAssetList();
 
 }
@@ -28,9 +30,11 @@ deleteAsset(id:number){
   if(confirm('Do you want to delete this record?'))
   {
     this.assetdefService.deleteAsset(id).subscribe(data=>{
-      
+     
       console.log(data);
     })
   }
+
 }
+
 }

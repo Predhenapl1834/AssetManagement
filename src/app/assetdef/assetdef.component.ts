@@ -4,6 +4,8 @@ import { AssetDef } from '../asset-def';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute } from '@angular/router';
 import { AssetDefService } from '../asset-def.service';
+import { AssetType } from '../asset-type';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-assetdef',
@@ -14,6 +16,7 @@ export class AssetdefComponent implements OnInit {
   assetForm: FormGroup;
   asset: AssetDef = new AssetDef;
   id: number;
+  assettypes:Observable<AssetType[]>;
   constructor(private formBuilder: FormBuilder, private service: AssetDefService,private route:ActivatedRoute,
     private toastr:ToastrService) { }
 
@@ -25,14 +28,28 @@ export class AssetdefComponent implements OnInit {
       ad_class: ['', Validators.compose([Validators.required])]
      
     });
+    this.assettypes=this.service.getAssetType();
+    this.assettypes.forEach(x=>{
+      x.forEach(res=>{
+        console.log(res["at_name"]);
+      })
+    })
   }
   addAsset() {
     this.asset.ad_name= this.assetForm.controls.ad_name.value;
     this.asset.ad_type_id = this.assetForm.controls.ad_type_id.value;
     this.asset.ad_class = this.assetForm.controls.ad_class.value;
-   console.log(this.asset);
-    this.service.addAsset(this.asset).subscribe();
-    this.toastr.success('Added Successfully..!!', 'Success');
+ 
+    this.service.addAsset(this.asset).subscribe(res=>{
+      if(res==1)
+      {
+        this.toastr.success('Added Successfully..!!', 'Success');
+      }
+      else{
+        this.toastr.error("Asset already exit!!!!!");
+      }
+    });
+  
     this.ngOnInit();
   }
 

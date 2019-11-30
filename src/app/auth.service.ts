@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 export class AuthService {
 
     
-  private baseUrl= 'http://localhost:11386/api';
+  private baseUrl= 'http://localhost:3963//api';
   formData: Login;
 
   constructor(private http: HttpClient) { }
@@ -19,7 +19,7 @@ export class AuthService {
   public Login(userInfo:Login): Observable<any>{
     
     localStorage.setItem('ACCESS_TOKEN',"access_token");
-    return this.http.get(this.baseUrl+'/loginTbls?username='+userInfo.username+'&password='+userInfo.password);
+    return this.http.get(this.baseUrl+'/Login?uname='+userInfo.username+'&pwd='+userInfo.password);
 
 
   }
@@ -35,7 +35,7 @@ export class AuthService {
   }
 
   public getLoginDet(): Observable<any>{
-    return this.http.get(this.baseUrl+'/loginTbls/');
+    return this.http.get(this.baseUrl+'/Login');
   }
 
 }
